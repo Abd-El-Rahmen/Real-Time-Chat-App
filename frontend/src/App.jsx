@@ -4,7 +4,6 @@ import LoginPage from "./pages/LoginPage";
 import HomePage from "./pages/HomePage";
 import SigninPage from "./pages/SigninPage";
 import ProfilePage from "./pages/ProfilePage";
-import SettingsPage from "./pages/SettingsPage";
 import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
 import { Loader } from "lucide-react";
@@ -49,7 +48,6 @@ function App() {
           path="/profile"
           element={authUser ? <ProfilePage /> : <Navigate to={"/login"} />}
         />
-        <Route path="/settings" element={<SettingsPage />} />
       </Routes>
     </div>
   );

@@ -1,7 +1,8 @@
 import React from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { Link } from "react-router-dom";
-import { LogOut, Hand , Settings, User } from "lucide-react";
+import { LogOut, Hand,  User } from "lucide-react";
+import ThemeButton from "./ThemeButton";
 
 const Navbar = () => {
   const { logout, authUser } = useAuthStore();
@@ -16,20 +17,14 @@ const Navbar = () => {
               className="flex items-center gap-2.5 hover:opacity-80 transition-all"
             >
               <div className="size-9 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Hand  className="w-5 h-5 text-primary" />
+                <Hand className="w-5 h-5 text-primary" />
               </div>
               <h1 className="text-lg font-bold">SayHy</h1>
             </Link>
           </div>
 
           <div className="flex items-center gap-2">
-            <Link
-              to={"/settings"}
-              className="btn btn-sm gap-2 transition-colors"
-            >
-              <Settings className="w-4 h-4" />
-              <span className="hidden sm:inline">Settings</span>
-            </Link>
+            <ThemeButton/>
             {authUser && (
               <>
                 <Link to={"/profile"} className="btn btn-sm gap-2">
