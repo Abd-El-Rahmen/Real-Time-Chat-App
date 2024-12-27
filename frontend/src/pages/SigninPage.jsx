@@ -118,7 +118,7 @@ const SigninPage = () => {
                   }
                 />
                 <div
-                  className="absolute right-2 top-2 p-1"
+                  className="absolute right-2 top-2 p-1 cursor-pointer hover:opacity-70 transition"
                   onClick={() => setShowPwd(!showPwd)}
                 >
                   {showPwd ? <EyeOff /> : <Eye />}

@@ -89,7 +89,7 @@ const LoginPage = () => {
                   }
                 />
                 <div
-                  className="absolute right-2 top-2 p-1"
+                  className="absolute right-2 top-2 p-1 cursor-pointer hover:opacity-70 transition"
                   onClick={() => setShowPwd(!showPwd)}
                 >
                   {showPwd ? <EyeOff /> : <Eye />}
@@ -123,8 +123,8 @@ const LoginPage = () => {
       </div>
 
       <AuthImagePattern
-        title="Join our community"
-        subtitle="Connect with friends, share moments, and stay in touch with your loved ones."
+        title={"Welcome back!"}
+        subtitle={"Sign in to continue your conversations and catch up with your messages."}
       />
     </div>
   );
