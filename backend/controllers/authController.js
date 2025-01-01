@@ -36,6 +36,24 @@ const loginUser = async (req, res) => {
   }
 };
 
+const getUserInfo = async (req, res) => {
+  const { userId } = req.params;
+  
+  try {
+    if (userId) {
+      const userInfo = await User.findById(userId).select("-password");
+      if (!userInfo) {
+        return res.status(401).json({
+          message: "user not found",
+        });
+      }
+      res.status(200).json(userInfo);
+    }
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 const signUpUser = async (req, res) => {
   try {
     const { userName, email, password } = req.body;
@@ -109,7 +127,7 @@ const updatePicture = async (req, res) => {
     }
 
     const uploadResponse = await cloudinary.uploader.upload(profilePic);
-    
+
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       {
@@ -117,7 +135,7 @@ const updatePicture = async (req, res) => {
       },
       { new: true }
     );
-    
+
     res.status(200).json(updatedUser);
   } catch (error) {
     console.log(error);
@@ -128,4 +146,4 @@ const updatePicture = async (req, res) => {
   }
 };
 
-export { loginUser, logoutUser, signUpUser, updatePicture };
+export { loginUser, logoutUser, signUpUser, updatePicture,getUserInfo };

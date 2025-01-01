@@ -9,6 +9,8 @@ import { useEffect } from "react";
 import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 import { useThemeStore } from "./store/useThemeStore";
+import CreateGroupPage from "./pages/CreateGroupPage";
+import SearchPage from "./pages/SearchPage";
 
 function App() {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -47,6 +49,14 @@ function App() {
         <Route
           path="/profile"
           element={authUser ? <ProfilePage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/create-group"
+          element={authUser ? <CreateGroupPage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/search"
+          element={authUser ? <SearchPage /> : <Navigate to={"/login"} />}
         />
       </Routes>
     </div>

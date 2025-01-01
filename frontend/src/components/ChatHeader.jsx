@@ -1,11 +1,12 @@
 import { X } from "lucide-react";
-import { useAuthStore } from "../store/useAuthStore";
 import { useChatStore } from "../store/useChatStore";
 import avatar from "../assets/avatar.svg";
+import { useFriendshipStore } from "../store/friendshipStore";
+import { Link } from "react-router-dom";
 
 const ChatHeader = () => {
   const { selectedUser, setSelectedUser } = useChatStore();
-  const { onlineUsers } = useAuthStore();
+  const { onlineFriends } = useFriendshipStore();
 
   return (
     <div className="p-2.5 border-b border-base-300">
@@ -21,9 +22,9 @@ const ChatHeader = () => {
           </div>
 
           <div>
-            <h3 className="font-medium">{selectedUser.fullName}</h3>
+            <Link to={`/profile?user=${encodeURIComponent(selectedUser._id)}`} className="font-medium hover:underline">{selectedUser.fullName}</Link >
             <p className="text-sm text-base-content/70">
-              {onlineUsers.includes(selectedUser._id) ? "Online" : "Offline"}
+              {onlineFriends.includes(selectedUser._id) ? "Online" : "Offline"}
             </p>
           </div>
         </div>

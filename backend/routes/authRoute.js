@@ -4,12 +4,14 @@ import {
   signUpUser,
   logoutUser,
   updatePicture,
+  getUserInfo
 } from "../controllers/authController.js";
 import { protectRoute } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 router.post("/login", loginUser);
+router.get("/get-user/:userId", protectRoute,getUserInfo);
 router.post("/signup", signUpUser);
 router.post("/logout", logoutUser);
 router.put("/update-picture", protectRoute, updatePicture);

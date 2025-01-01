@@ -29,7 +29,6 @@ const LoginPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const dataValid = validDataForm();
-    console.log(formData);
     if (dataValid === true) {
       login(formData);
     }

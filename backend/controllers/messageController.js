@@ -1,24 +1,7 @@
 import cloudinary from "../lib/cloudinary.js";
 import { getReceiverSocketId, io } from "../lib/socket.js";
 import Message from "../models/Message.js";
-import User from "../models/User.js";
 
-const getUsersForSidebar = async (req, res) => {
-  try {
-    const loggedInUserId = req.user._id;
-    const filteredUsers = await User.find({
-      _id: { $ne: loggedInUserId },
-    }).select("-password");
-
-    res.status(200).json(filteredUsers);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({
-      success: false,
-      message: "Erro Occured",
-    });
-  }
-};
 
 const getMessages = async (req, res) => {
   try {
@@ -80,4 +63,4 @@ const sendMessage = async (req, res) => {
   }
 };
 
-export { getUsersForSidebar, getMessages, sendMessage };
+export {  getMessages, sendMessage };

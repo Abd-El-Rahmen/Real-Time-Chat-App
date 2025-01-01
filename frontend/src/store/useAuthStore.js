@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
+import { filterUsers } from "../lib/utils.js";
+import { useFriendshipStore } from "./friendshipStore.js";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
@@ -11,13 +13,15 @@ export const useAuthStore = create((set, get) => ({
   isLoggingIn: false,
   isUpdatingProfile: false,
   isCheckingAuth: true,
+  userInfo: null,
+  getUserInfoLoading: false,
   onlineUsers: [],
   socket: null,
 
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/check");
-      
+
       set({ authUser: res.data.user });
       get().connectSocket();
     } catch (error) {
@@ -41,7 +45,15 @@ export const useAuthStore = create((set, get) => ({
       set({ isSigningUp: false });
     }
   },
-
+  getUserInfo: async (userId) => {
+    try {      
+      const res = await axiosInstance.get(`/auth/get-user/${userId}`);
+      
+      set({ userInfo: res.data });
+    } catch (error) {
+      console.log(error);
+    }
+  },
   login: async (data) => {
     set({ isLoggingIn: true });
     try {
@@ -94,6 +106,12 @@ export const useAuthStore = create((set, get) => ({
     set({ socket: socket });
     socket.on("getOnlineUsers", (userIds) => {
       set({ onlineUsers: userIds });
+      const onlineFr = filterUsers(
+        userIds,
+        useFriendshipStore.getState().friends,
+        get().authUser._id
+      );
+      useFriendshipStore.setState({ onlineFriends: onlineFr });
     });
   },
 

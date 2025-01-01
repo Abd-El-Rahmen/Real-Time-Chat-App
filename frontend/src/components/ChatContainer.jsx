@@ -20,7 +20,6 @@ const ChatContainer = () => {
   const messageEndRef = useRef(null);
 
   useEffect(() => {
-    
     getMessages(selectedUser._id);
     subscribeToMessages();
     return () => unsubscribeFromMessages();
@@ -59,7 +58,7 @@ const ChatContainer = () => {
                   src={
                     message.senderId === authUser._id
                       ? (authUser.profilePic ? authUser.profilePic : avatar )
-                      : (selectedUser.profilePic ? selectedUser.profilePic : avatar)
+                      : (profilePic ? selectedUser.profilePic : avatar)
                   }
                   alt="profile pic"
                 />
