@@ -91,11 +91,7 @@ export const useFriendshipStore = create((set, get) => ({
           (request) => request.sender._id !== userId
         ),
       });
-      // console.log(useChatStore.getState.selectedUser._id === userId);
-      
-      // if (useChatStore.getState.selectedUser._id === userId) {
-      //   useChatStore.setState({ selectedUser: null });
-      // }
+
       toast.success("Unfriended successfully.");
     } catch (error) {
       toast.error("Error unfriending user.");

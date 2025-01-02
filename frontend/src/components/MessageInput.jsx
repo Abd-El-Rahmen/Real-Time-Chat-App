@@ -2,12 +2,14 @@ import { Image, Send, X } from "lucide-react";
 import React, { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useChatStore } from "../store/useChatStore";
+import { useGroupChatStore } from "../store/groupStore";
 
 const MessageInput = () => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
-  const { sendMessage } = useChatStore();
+  const { sendMessage,selectedUser } = useChatStore();
+  const {sendGroupMessage,currentGroup} = useGroupChatStore();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -25,9 +27,11 @@ const MessageInput = () => {
     setImagePreview(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!text.trim() && !imagePreview) return;
+    if( selectedUser) {
+      if (!text.trim() && !imagePreview) return;
     try {
       await sendMessage({
         text: text.trim(),
@@ -37,6 +41,21 @@ const MessageInput = () => {
       setImagePreview(null);
     } catch (error) {
       console.error("Failed to send message: ", error);
+    }
+    }
+    if(currentGroup) {
+      if (!text.trim() && !imagePreview) return;
+      try {
+        await sendGroupMessage({
+          text: text.trim(),
+          image: imagePreview,
+          groupId: currentGroup._id
+        });
+        setText("");
+        setImagePreview(null);
+      } catch (error) {
+        console.error("Failed to send message: ", error);
+      }
     }
   };
   return (

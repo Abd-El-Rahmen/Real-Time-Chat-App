@@ -58,6 +58,7 @@ function App() {
           path="/search"
           element={authUser ? <SearchPage /> : <Navigate to={"/login"} />}
         />
+        
       </Routes>
     </div>
   );

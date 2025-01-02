@@ -46,12 +46,14 @@ export const useAuthStore = create((set, get) => ({
     }
   },
   getUserInfo: async (userId) => {
-    try {      
+    set({ getUserInfoLoading: true });
+    try {
       const res = await axiosInstance.get(`/auth/get-user/${userId}`);
-      
       set({ userInfo: res.data });
     } catch (error) {
       console.log(error);
+    } finally {
+      set({ getUserInfoLoading: false });
     }
   },
   login: async (data) => {

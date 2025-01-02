@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
-import { Camera, User } from "lucide-react";
+import { Camera, Loader2, User } from "lucide-react";
 import avatar from "../assets/avatar.svg";
 import { useFriendshipStore } from "../store/friendshipStore";
 import { Navigate, useLocation } from "react-router-dom";
@@ -18,7 +18,7 @@ const ProfilePage = () => {
   const [isFriend, setIsFriend] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [pending, setPending] = useState(null);
-  const [unfriendButton,setUnfriendButton] = useState("")
+  const [unfriendButton, setUnfriendButton] = useState("");
   const {
     sendFriendRequest,
     getFriendRequests,
@@ -29,6 +29,7 @@ const ProfilePage = () => {
     sentRequests,
     getFriends,
     unfriendUser,
+    isLoading,
   } = useFriendshipStore();
 
   const handleImageUpload = (e) => {
@@ -47,36 +48,36 @@ const ProfilePage = () => {
 
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    setUserId(queryParams.get("user"));
-    getUserInfo(queryParams.get("user"));
-    getSentRequests();
-    getFriendRequests();
-    getFriends(authUser._id);
-    const req = friendRequests.map((req) => {
-      if (req.sender._id === userInfo?._id) return req;
-    })[0];
+    const newId = queryParams.get("user");
+    setUserId(newId);
 
-    setPending(req !== undefined ? req : null);
+    const fetchUserData = async () => {
+      await getUserInfo(newId);
+      await getSentRequests();
+      await getFriendRequests();
+      await getFriends(authUser._id);
+    };
 
+    fetchUserData();
+  }, [location.search, authUser._id,userId]);
+
+  useEffect(() => {
+    if (!userInfo) return;
+
+    const req = friendRequests.find((req) => req.sender._id === userInfo?._id);
+
+    setPending(req || null);
     setRequestSent(
-      sentRequests.map((req) => req.receiver._id).includes(userInfo?._id)
+      sentRequests.some((req) => req.receiver._id === userInfo?._id)
     );
-    setIsFriend(friends.map((friend) => friend._id).includes(userId));
-    setUnfriendButton(isFriend ? "Unfriend" : pending !== null ? "Refuse" :   "")
-  }, [
-    userInfo,
-    location.search,
-    getSentRequests,
-    getFriends,
-    authUser,
-    sendFriendRequest,
-    acceptFriendRequest,
-  ]);
+    setIsFriend(friends.some((friend) => friend._id === userId));
+    setUnfriendButton(isFriend ? "Unfriend" : pending ? "Refuse" : "");
+  }, [userInfo, friendRequests, sentRequests, friends, userId]);
 
-  if (getUserInfoLoading) {
+  if (getUserInfoLoading || isLoading) {
     return (
       <div className="bg-base-300 min-h-screen flex flex-col items-center justify-center gap-3">
-        <Loader2 className="size-5 animate-spin " />
+        <Loader2 className="size-5 animate-spin" />
         Loading...
       </div>
     );
@@ -169,7 +170,9 @@ const ProfilePage = () => {
                 unfriendUser(userId);
                 setPending(null);
               }}
-              className={`btn bg-error w-full ${unfriendButton.length === 0 && "hidden"}`}
+              className={`btn bg-error w-full ${
+                unfriendButton.length === 0 && "hidden"
+              }`}
             >
               {unfriendButton}
             </button>

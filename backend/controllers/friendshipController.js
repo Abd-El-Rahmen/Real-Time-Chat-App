@@ -39,9 +39,7 @@ const getFriendRequests = async (req, res) => {
       status: "pending",
     }).populate("sender", "fullName profilePic email");
 
-    if (requests.length > 0) {
-      res.status(200).json(requests);
-    }
+    res.status(200).json(requests);
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -58,11 +56,6 @@ const getSentRequests = async (req, res) => {
       status: "pending",
     }).populate("receiver", "fullName profilePic email");
 
-    if (requests.length === 0) {
-      return res.status(400).json({
-        message: "There are no friend requests.",
-      });
-    }
     res.status(200).json(requests);
   } catch (error) {
     console.error(error);

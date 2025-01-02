@@ -3,8 +3,22 @@ import Group from "../models/Group.js";
 import Message from "../models/Message.js";
 import { io, getReceiverSocketId } from "../lib/socket.js";
 
+const getGroups = async (req, res) => {
+  const userId = req.user._id;
+  try {
+    const groups = await Group.find({
+      $or: [{ admin: userId }, { members: { $in: [userId] } }],
+    });
+
+    res.status(200).json(groups);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Error fetching groups" });
+  }
+};
+
 const createGroup = async (req, res) => {
-  const admin = req.user;
+  const admin = req.user._id;
   const { name, members } = req.body;
 
   try {
@@ -32,7 +46,7 @@ const createGroup = async (req, res) => {
 };
 
 const addMemberToGroup = async (req, res) => {
-    const {userId} = req.user._id
+  const { userId } = req.user._id;
   const { groupId } = req.params;
 
   try {
@@ -62,7 +76,7 @@ const addMemberToGroup = async (req, res) => {
 };
 
 const sendGroupMessage = async (req, res) => {
-  const senderId = req.user;
+  const senderId = req.user._id;
   const { groupId, text, image } = req.body;
 
   try {
@@ -72,7 +86,7 @@ const sendGroupMessage = async (req, res) => {
       return res.status(404).json({ message: "Group not found." });
     }
 
-    if (!group.members.includes(senderId)) {
+    if (!group.members.includes(senderId) && !group.admin === senderId) {
       return res
         .status(403)
         .json({ message: "You are not a member of this group." });
@@ -89,26 +103,33 @@ const sendGroupMessage = async (req, res) => {
     }
 
     const newMessage = new Message({
-      senderId,
-      groupId,
-      text,
-      imageUrl,
+      senderId: senderId,
+      groupId: groupId,
+      text: text,
+      image: imageUrl,
     });
 
     await newMessage.save();
-    res.status(200).json({ message: "Message sent to group.", newMessage });
+    const populatedMessage = await newMessage.populate(
+      "senderId",
+      "fullName profilePic email"
+    );
+
+    res.status(200).json(populatedMessage);
 
     group.members.forEach((memberId) => {
       const socketId = getReceiverSocketId(memberId);
       if (socketId) {
-        io.to(socketId).emit("receiveGroupMessage", {
-          groupId,
-          senderId,
-          text,
-          imageUrl,
-        });
+        io.to(socketId).emit("newGroupMessage", populatedMessage);
       }
     });
+
+    if (senderId !== group.admin) {
+      const socketId = getReceiverSocketId(group.admin);
+      if (socketId) {
+        io.to(socketId).emit("newGroupMessage", populatedMessage);
+      }
+    }
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error sending message." });
@@ -125,17 +146,18 @@ const getGroupMessages = async (req, res) => {
       return res.status(404).json({ message: "Group not found." });
     }
 
-    if (!group.members.includes(userId)) {
+    if (!group.members.includes(userId) && !group.admin === userId) {
       return res
         .status(403)
         .json({ message: "You are not a member of this group." });
     }
 
-    const messages = await Message.find({ groupId }).sort({ createdAt: -1 });
+    const messages = await Message.find({ groupId }).populate(
+      "senderId",
+      "fullName email profilePic"
+    );
 
-    res.status(200).json({
-      messages,
-    });
+    res.status(200).json(messages);
   } catch (error) {
     console.error(error);
     res.status(500).json({
@@ -145,4 +167,10 @@ const getGroupMessages = async (req, res) => {
   }
 };
 
-export { sendGroupMessage, addMemberToGroup, createGroup, getGroupMessages };
+export {
+  sendGroupMessage,
+  addMemberToGroup,
+  createGroup,
+  getGroupMessages,
+  getGroups,
+};
