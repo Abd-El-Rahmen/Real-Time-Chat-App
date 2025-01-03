@@ -9,7 +9,6 @@ This is a real-time chat application built with the MERN stack (MongoDB, Express
 - **Group Chat**: Users can create and participate in group chats.
 - **User Authentication**: Users can sign up, log in, and manage their profiles.
 - **Profile Customization**: Users can update their profile pictures and display names.
-- **Notifications**: Users receive notifications for new messages and other important actions (e.g., friend requests, group invitations).
 - **Responsive UI**: Built with React and styled to be mobile-friendly.
 
 ## Tech Stack
