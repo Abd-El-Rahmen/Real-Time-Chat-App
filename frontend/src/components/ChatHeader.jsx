@@ -59,9 +59,9 @@ const ChatHeader = () => {
               </div>
             </div>
 
-            <div className="font-medium hover:underline">
+            <Link to={`/group?group=${encodeURIComponent(currentGroup._id)}`} className="font-medium hover:underline">
               {currentGroup.name}
-            </div>
+            </Link>
           </div>
 
           <button onClick={() => setGroup(null)}>

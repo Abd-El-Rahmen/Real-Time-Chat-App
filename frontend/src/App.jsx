@@ -11,6 +11,7 @@ import { Toaster } from "react-hot-toast";
 import { useThemeStore } from "./store/useThemeStore";
 import CreateGroupPage from "./pages/CreateGroupPage";
 import SearchPage from "./pages/SearchPage";
+import GroupPage from "./pages/GroupPage";
 
 function App() {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -53,6 +54,10 @@ function App() {
         <Route
           path="/create-group"
           element={authUser ? <CreateGroupPage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/group"
+          element={authUser ? <GroupPage /> : <Navigate to={"/login"} />}
         />
         <Route
           path="/search"

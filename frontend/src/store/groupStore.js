@@ -1,10 +1,7 @@
 import { create } from "zustand";
 import { axiosInstance } from "../lib/axios.js";
 import toast from "react-hot-toast";
-import { io } from "socket.io-client";
 import { useAuthStore } from "./useAuthStore.js";
-
-const BASE_URL = import.meta.env.VITE_API_URL;
 
 export const useGroupChatStore = create((set, get) => ({
   groups: [],
@@ -13,6 +10,20 @@ export const useGroupChatStore = create((set, get) => ({
   socket: null,
   currentGroup: null,
   groupLoading: false,
+  groupInfo: null,
+
+  getGroupInfo: async (groupId) => {
+    set({ groupLoading: true });
+    try {
+      const res = await axiosInstance.get(`/group/${groupId}`);
+
+      set({ groupInfo: res.data ? res.data : null });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      set({ groupLoading: false });
+    }
+  },
 
   getGroups: async () => {
     set({ groupLoading: true });
@@ -45,15 +56,32 @@ export const useGroupChatStore = create((set, get) => ({
     }
   },
 
-  addMemberToGroup: async (groupId, userId) => {
+  leaveGroup: async (groupId) => {
     try {
-      await axiosInstance.put(`/group/addMemberToGroup/${groupId}`, {
-        userId,
+      await axiosInstance.put(`/group/leaveGroup/${groupId}`);
+      set({
+        groups: get().groups.filter((group) => group._id !== groupId),
+        currentGroup: null,
+        groupInfo: null,
       });
-      toast.success("Member added to group");
+      toast.success("You left the group");
     } catch (error) {
       console.error(error);
       toast.error("Error adding member");
+    }
+  },
+
+  deleteGroup: async (groupId) => {
+    try {
+      await axiosInstance.delete(`/group/delete/${groupId}`);
+      set({
+        groups: get().groups.filter((group) => group._id !== groupId),
+        currentGroup: null,
+        groupInfo: null,
+      });
+      toast.success("group deleted");
+    } catch (error) {
+      console.log(error);
     }
   },
 
@@ -70,6 +98,7 @@ export const useGroupChatStore = create((set, get) => ({
       console.log(error);
     }
   },
+
   getGroupMessages: async (groupId) => {
     try {
       const response = await axiosInstance.get(

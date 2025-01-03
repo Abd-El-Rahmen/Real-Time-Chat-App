@@ -3,6 +3,34 @@ import Group from "../models/Group.js";
 import Message from "../models/Message.js";
 import { io, getReceiverSocketId } from "../lib/socket.js";
 
+const getGroupInfo = async (req, res) => {
+  const userId = req.user._id;
+  const { groupId } = req.params;
+
+  try {
+    const group = await Group.findById(groupId)
+      .populate("members", "fullName profilePic email")
+      .populate("admin", "fullName profilePic email");
+
+    if (
+      group &&
+      (group.members.some(
+        (member) => member._id.toString() === userId.toString()
+      ) ||
+        group.admin._id.toString() === userId.toString())
+    ) {
+      return res.status(200).json(group);
+    }
+
+    return res
+      .status(403)
+      .json({ message: "You do not have permission to access this group." });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error." });
+  }
+};
+
 const getGroups = async (req, res) => {
   const userId = req.user._id;
   try {
@@ -42,36 +70,6 @@ const createGroup = async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Error creating group." });
-  }
-};
-
-const addMemberToGroup = async (req, res) => {
-  const { userId } = req.user._id;
-  const { groupId } = req.params;
-
-  try {
-    const group = await Group.findById(groupId);
-
-    if (!group) {
-      return res.status(404).json({ message: "Group not found." });
-    }
-
-    if (group.members.includes(userId)) {
-      return res.status(400).json({ message: "User is already a member." });
-    }
-
-    group.members.push(userId);
-    await group.save();
-
-    res.status(200).json({ message: "User added to group.", group });
-
-    const socketId = getReceiverSocketId(userId);
-    if (socketId) {
-      io.to(socketId).emit("groupJoined", groupId);
-    }
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Error adding member to group." });
   }
 };
 
@@ -136,6 +134,66 @@ const sendGroupMessage = async (req, res) => {
   }
 };
 
+const leaveGroup = async (req, res) => {
+  const userId = req.user._id;
+  const { groupId } = req.params;
+  try {
+    const group = await Group.findById(groupId);
+
+    if (!group) {
+      return res.status(404).json({ message: "Group not found." });
+    }
+
+    if (
+      !group.members.includes(userId) ||
+      group.admin.toString() === userId.toString()
+    ) {
+      return res.status(400).json({ message: "You are not a member." });
+    }
+
+    group.members = group.members.filter(
+      (member) => member._id.toString() !== userId.toString()
+    );
+    await group.save();
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Error Occured." });
+  }
+};
+
+const deleteGroup = async (req, res) => {
+  const userId = req.user._id;
+  const { groupId } = req.params;
+  try {
+    const group = await Group.findById(groupId);
+
+    if (!group) {
+      return res.status(404).json({ message: "Group not found." });
+    }
+
+    if (!group.admin.toString() === userId.toString()) {
+      return res
+        .status(403)
+        .json({ message: "You are not allowed to do this." });
+    }
+
+    const messages = await Message.find({ groupId });
+
+    await Message.deleteMany({ groupId });
+
+    await group.deleteOne();
+
+    return res
+      .status(200)
+      .json({ message: "Group and associated messages deleted successfully." });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Error occurred",
+    });
+  }
+};
+
 const getGroupMessages = async (req, res) => {
   const { userId } = req.user._id;
   const { groupId } = req.params;
@@ -169,8 +227,10 @@ const getGroupMessages = async (req, res) => {
 
 export {
   sendGroupMessage,
-  addMemberToGroup,
+  leaveGroup,
   createGroup,
   getGroupMessages,
   getGroups,
+  getGroupInfo,
+  deleteGroup
 };

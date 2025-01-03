@@ -1,23 +1,13 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useChatStore } from "../store/useChatStore";
-import SidebarSkeleton from "./skeleton/SidebarSkeleton";
-import { Users, UserRoundPlus, Triangle } from "lucide-react";
-import { useAuthStore } from "../store/useAuthStore";
-import avatar from "../assets/avatar.svg";
-import { useFriendshipStore } from "../store/friendshipStore";
+import { Users, Triangle } from "lucide-react";
 import Contacts from "./Contacts";
 import Groups from "./Groups";
 import { useGroupChatStore } from "../store/groupStore";
 
 const Sidebar = () => {
-  const { selectedUser, setSelectedUser, isUsersLoading } = useChatStore();
-  const { groups, getGroups, setGroup, currentGroup } = useGroupChatStore();
-
-  const { friends, getFriends, onlineFriends } = useFriendshipStore();
-
-  const { authUser } = useAuthStore();
-
-  const [showOnlineOnly, setShowOnlineOnly] = useState(false);
+  const { setSelectedUser } = useChatStore();
+  const { setGroup } = useGroupChatStore();
 
   const [content, setContent] = useState(
     localStorage.getItem("content") || "Contact"

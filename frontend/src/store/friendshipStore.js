@@ -2,7 +2,6 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { useAuthStore } from "./useAuthStore";
-import { useChatStore } from "./useChatStore";
 
 export const useFriendshipStore = create((set, get) => ({
   friends: [],
@@ -16,7 +15,7 @@ export const useFriendshipStore = create((set, get) => ({
     set({ onlineFriends: of });
   },
 
-  getFriends: async (userId) => {
+  getFriends: async () => {
     set({ isLoading: true });
     try {
       useAuthStore.apply.connectSocket;
@@ -64,7 +63,6 @@ export const useFriendshipStore = create((set, get) => ({
         status: "accepted",
         friendshipId: requestId,
       });
-      console.log("friends", get().friends);
       set({
         friends: [...get().friends, res.data.sender],
         friendRequests: get().friendRequests.filter(
