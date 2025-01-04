@@ -33,6 +33,46 @@ This is a real-time chat application built with the MERN stack (MongoDB, Express
 
 ### 1. Clone the repository
 
-```bash
+````bash
 git clone https://github.com/Abd-El-Rahmen/Real-Time-Chat-App.git
 cd Real-Time-Chat-App
+
+### 2. Install Backend Dependencies
+
+```bash
+cd backend
+npm install express mongoose socket.io jwt-simple dotenv bcryptjs cloudinary cors
+
+### 3. Configure Environment Variables
+
+```env
+
+PORT
+MONGODB_URL
+JWT_SECRET
+NODE_DEV
+FRONTEND
+COUNDINARY_API_KE
+COUNDINARY_NAME
+COUNDINARY_API_SECRET
+
+### 4. Run the Backend Server
+
+```bash
+npm run dev
+
+### 5. Install Frontend Dependencies
+
+```bash
+cd ../frontend
+npm install
+
+### 6. Configure Frontend Environment Variables
+
+```env
+VITE_API_URL 
+
+### 7. Run the Frontend Server
+
+```bash
+npm run dev
