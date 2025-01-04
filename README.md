@@ -15,10 +15,11 @@ This is a real-time chat application built with the MERN stack (MongoDB, Express
 ## Tech Stack
 
 - **Frontend**: React, Socket.io-client, Axios,zustand
-- **Backend**: Node.js, Express.js, Socket.io, Cloudinary
+- **Backend**: Node.js, Express.js
 - **Database**: MongoDB, Mongoose
 - **Authentication**: JWT (JSON Web Token)
 - **Real-Time Communication**: Socket.io
+- **Image Storage**: cloudinary
 - **Styling**: CSS, tailwindcss, daisyui
 
 ## Prerequisites
